@@ -1,3 +1,5 @@
+// SVG Link
+const SVG_LINK = "http://www.w3.org/2000/svg";
 // Get info for this moment
 const CURRENT = moment();
 // Schedule length
@@ -12,20 +14,88 @@ const BTN_COL_SIZE = 2;
 
 const initSchedule = () => {
     return ["", "", "", "", "", "", "", "", ""];
-};
+}
+
+const svgIcons = {
+    // Found in: https://icons.getbootstrap.com/icons/calendar-plus/
+    "calendar-plus": {
+        properties: {
+            "width": "1em",
+            "height": "1em",
+            "viewBox": "0 0 16 16",
+            "class": "bi bi-calendar-plus",
+            "fill": "currentColor",
+            "xmlns": SVG_LINK
+        },
+        paths: [
+            "M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z",
+            "M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7z"
+        ]
+    }
+}
+
+const createIcon = (iconType) => {
+    const svg = document.createElementNS(SVG_LINK, "svg");
+
+    const {properties, paths} = svgIcons[iconType];
+
+    // Add all SVG properties
+    const keys = Object.keys(properties);
+    keys.forEach((key)=> {
+        svg.setAttribute(key, properties[key])
+    })
+
+    // Add all paths
+    paths.forEach((path) => {
+        const p = document.createElementNS(SVG_LINK, "path");
+        p.setAttribute("fill-rule", "evenodd");
+        p.setAttribute("d", path);
+        svg.append(p);
+    })
+    
+    // document.getElementById("currentDay").append(svg);
+    console.log(svg);
+    return svg;
+}
 
 const createCol = (size, style) => {
+    const col = document.createElement("div");
+    col.classList.add(`col-${size}`);
+    col.classList.add(style);
+    return col;
 }
 
 const createHourCol = (hour) => {
+    const col = createCol(HOUR_COL_SIZE, "hour");
+    col.classList.add("text-right");
+    col.textContent = hour === 12 ? `12 PM` : hour < 12 ? `${hour} AM` : `${hour-12} PM`;
+    return col;
 }
 
 const createContentCol = (content, currentHour, hour) => {
+    const col = createCol(CONTENT_COL_SIZE, "textarea");
+    col.classList.add("content");
 
+    if (currentHour === hour)
+        col.classList.add("present");
+    else if (currentHour < hour)
+        col.classList.add("future");
+    else
+        col.classList.add("past");
+
+    col.textContent = content;
+    return col;
 }
 
 const createBtnCol = (hour) => {
-
+    const col = createCol(BTN_COL_SIZE, "saveBtn");
+    const icon = createIcon("calendar-plus");
+    icon.addEventListener("click", (event) => {
+        console.log("HI");
+    });
+    col.append(icon);
+    
+    return col;
 }
 
 const createRow = (currentHour, hour, content) => {
@@ -37,7 +107,7 @@ const createRow = (currentHour, hour, content) => {
     // Create the current row
     const row = document.createElement("div");
     row.classList.add("row");
-    row.classList.add("jumbotron");
+    row.classList.add("time-block");
     
     row.id = hour;
     row.append(hourCol, contentCol, btnCol);  
@@ -63,5 +133,5 @@ const createRow = (currentHour, hour, content) => {
         const hour = i + START_AT;
         const row = createRow(currentHour, hour, content);
         container.append(row);       
-    })
+    }) 
 })();
