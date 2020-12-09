@@ -9,12 +9,8 @@ const START_AT = 9;
 
 // Size for all columns
 const HOUR_COL_SIZE = 2;
-const CONTENT_COL_SIZE = 8;
-const BTN_COL_SIZE = 2;
-
-const initSchedule = () => {
-    return ["", "", "", "", "", "", "", "", ""];
-}
+const CONTENT_COL_SIZE = 9;
+const BTN_COL_SIZE = 1;
 
 const svgIcons = {
     // Found in: https://icons.getbootstrap.com/icons/calendar-plus/
@@ -32,6 +28,10 @@ const svgIcons = {
             "M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7z"
         ]
     }
+}
+
+const initSchedule = () => {
+    return ["", "", "", "", "", "", "", "", ""];
 }
 
 const createIcon = (iconType) => {
@@ -53,8 +53,6 @@ const createIcon = (iconType) => {
         svg.append(p);
     })
     
-    // document.getElementById("currentDay").append(svg);
-    console.log(svg);
     return svg;
 }
 
@@ -89,10 +87,14 @@ const createContentCol = (content, currentHour, hour) => {
 
 const createBtnCol = (hour) => {
     const col = createCol(BTN_COL_SIZE, "saveBtn");
+    col.classList.add("d-flex", "justify-content-center");
+
     const icon = createIcon("calendar-plus");
+    icon.classList.add("m-auto");
     icon.addEventListener("click", (event) => {
         console.log("HI");
     });
+    
     col.append(icon);
     
     return col;
