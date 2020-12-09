@@ -13,7 +13,7 @@ const TEXT_COL_SIZE = 9;
 const BTN_COL_SIZE = 1;
 
 const svgIcons = {
-    // SVG Button found in Bootstrap icon: https://icons.getbootstrap.com/icons/calendar-plus/
+    // SVG Icon found in Bootstrap: https://icons.getbootstrap.com/icons/calendar-plus/
     "calendar-plus": {
         properties: {
             "width": "1em",
@@ -41,7 +41,7 @@ const createIcon = (iconType) => {
 
     // Add all SVG properties
     const keys = Object.keys(properties);
-    keys.forEach((key)=> {
+    keys.forEach((key) => {
         svg.setAttribute(key, properties[key])
     })
 
@@ -52,7 +52,6 @@ const createIcon = (iconType) => {
         p.setAttribute("d", path);
         svg.append(p);
     })
-    
     return svg;
 }
 
@@ -66,7 +65,7 @@ const createHourCol = (hour) => {
 const createTextCol = (currentHour, hour, content="") => {
     
     const col = document.createElement("textarea");
-    col.classList.add(`col-${TEXT_COL_SIZE}`);
+    col.classList.add(`col-${TEXT_COL_SIZE}`, "text");
 
     if (currentHour === hour)
         col.classList.add("present");
@@ -75,36 +74,37 @@ const createTextCol = (currentHour, hour, content="") => {
     else
         col.classList.add("past");
 
+    col.id = hour;
     col.textContent = content;
     return col;
 }
 
-const createBtnCol = (hour) => {
+const createBtnCol = (hour, setSchedule) => {
     const col = document.createElement("div");
     col.classList.add(`col-${BTN_COL_SIZE}`, "saveBtn", "d-flex", "justify-content-center");
 
     const icon = createIcon("calendar-plus");
     icon.classList.add("m-auto");
     icon.addEventListener("click", (event) => {
-        console.log("HI");
+        // console.log(document.getElementById(hour).value);
+        setSchedule(document.getElementById(hour).value);
     });
     
     col.append(icon);
     return col;
 }
 
-const createRow = (currentHour, hour, content) => {
+const createRow = (currentHour, hour, content, setSchedule) => {
     // Add three col for the row
     const hourCol = createHourCol(hour);
-    const textCol = createTextCol(currentHour, hour,content);
-    const btnCol = createBtnCol(hour);
+    const textCol = createTextCol(currentHour, hour, content);
+    const btnCol = createBtnCol(hour, setSchedule);
 
     // Create the current row
     const row = document.createElement("div");
     row.classList.add("row");
     row.classList.add("time-block");
     
-    row.id = hour;
     row.append(hourCol, textCol, btnCol);  
     
     return row;
@@ -116,17 +116,37 @@ const createRow = (currentHour, hour, content) => {
     currentDay.textContent = CURRENT.format("dddd, MMMM Do");
     currentDay.classList.add("time-block");
 
-    // Get schedule from local storage
-    const scheduleInStr = localStorage.getItem("schedule");
-    // Make schedule into array
-    let schedule = scheduleInStr ? scheduleInStr.split() : initSchedule();
+    const getSchedule = () => {
+        // Get schedule from local storage
+        const scheduleInStr = localStorage.getItem("schedule");
+        // Make schedule into array
+        return scheduleInStr ? scheduleInStr.split(",") : initSchedule();
+    }
+    
+    const setSchedule = (schedule, i, entry) => {
+        schedule[i] = entry;
+        console.log(schedule);
+        localStorage.setItem("schedule", schedule.toString());
+        reloadContent();
+    }
 
-    const container = document.getElementsByClassName("container")[0];
-   
-    currentHour = parseInt(CURRENT.toObject().hours);
-    schedule.forEach((content, i) => {
-        const hour = i + START_AT;
-        const row = createRow(currentHour, hour, content);
-        container.append(row);       
-    }) 
+    const clearElements = (parent) => {
+        while(parent.firstChild)
+            parent.removeChild(parent.firstChild)
+    }
+
+    const reloadContent = () => {
+        const container = document.getElementsByClassName("container")[0];
+        clearElements(container);
+        const currentHour = parseInt(CURRENT.toObject().hours);
+        const schedule = getSchedule();
+        console.log(schedule);
+
+        schedule.forEach((content, i) => {
+            const hour = i + START_AT;
+            const row = createRow(currentHour, hour, content, entry => setSchedule(schedule, i, entry));
+            container.append(row);       
+        }) 
+    }
+    reloadContent();
 })();
