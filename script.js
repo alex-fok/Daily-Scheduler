@@ -13,7 +13,7 @@ const TEXT_COL_SIZE = 9;
 const BTN_COL_SIZE = 1;
 
 const svgIcons = {
-    // Found in: https://icons.getbootstrap.com/icons/calendar-plus/
+    // SVG Button found in Bootstrap icon: https://icons.getbootstrap.com/icons/calendar-plus/
     "calendar-plus": {
         properties: {
             "width": "1em",
@@ -56,22 +56,15 @@ const createIcon = (iconType) => {
     return svg;
 }
 
-const createSideCol = (size, style) => {
-    const col = document.createElement("div");
-    col.classList.add(`col-${size}`, style);
-    return col;
-}
-
 const createHourCol = (hour) => {
-    const col = createSideCol(HOUR_COL_SIZE, "hour");
-    col.classList.add("text-right");
+    const col = document.createElement("div");
+    col.classList.add(`col-${HOUR_COL_SIZE}`, "hour", "text-right");
     col.textContent = hour === 12 ? `12 PM` : hour < 12 ? `${hour} AM` : `${hour-12} PM`;
     return col;
 }
 
-const createDescCol = (currentHour, hour, content="") => {
-    // const col = createCol(CONTENT_COL_SIZE, "textarea");
-    //col.classList.add("description");
+const createTextCol = (currentHour, hour, content="") => {
+    
     const col = document.createElement("textarea");
     col.classList.add(`col-${TEXT_COL_SIZE}`);
 
@@ -87,8 +80,8 @@ const createDescCol = (currentHour, hour, content="") => {
 }
 
 const createBtnCol = (hour) => {
-    const col = createSideCol(BTN_COL_SIZE, "saveBtn");
-    col.classList.add("d-flex", "justify-content-center");
+    const col = document.createElement("div");
+    col.classList.add(`col-${BTN_COL_SIZE}`, "saveBtn", "d-flex", "justify-content-center");
 
     const icon = createIcon("calendar-plus");
     icon.classList.add("m-auto");
@@ -103,7 +96,7 @@ const createBtnCol = (hour) => {
 const createRow = (currentHour, hour, content) => {
     // Add three col for the row
     const hourCol = createHourCol(hour);
-    const textCol = createDescCol(currentHour, hour,content);
+    const textCol = createTextCol(currentHour, hour,content);
     const btnCol = createBtnCol(hour);
 
     // Create the current row
