@@ -9,7 +9,7 @@ const START_AT = 9;
 
 // Size for all columns
 const HOUR_COL_SIZE = 2;
-const CONTENT_COL_SIZE = 9;
+const TEXT_COL_SIZE = 9;
 const BTN_COL_SIZE = 1;
 
 const svgIcons = {
@@ -56,23 +56,24 @@ const createIcon = (iconType) => {
     return svg;
 }
 
-const createCol = (size, style) => {
+const createSideCol = (size, style) => {
     const col = document.createElement("div");
-    col.classList.add(`col-${size}`);
-    col.classList.add(style);
+    col.classList.add(`col-${size}`, style);
     return col;
 }
 
 const createHourCol = (hour) => {
-    const col = createCol(HOUR_COL_SIZE, "hour");
+    const col = createSideCol(HOUR_COL_SIZE, "hour");
     col.classList.add("text-right");
     col.textContent = hour === 12 ? `12 PM` : hour < 12 ? `${hour} AM` : `${hour-12} PM`;
     return col;
 }
 
-const createContentCol = (content, currentHour, hour) => {
-    const col = createCol(CONTENT_COL_SIZE, "textarea");
-    col.classList.add("content");
+const createDescCol = (currentHour, hour, content="") => {
+    // const col = createCol(CONTENT_COL_SIZE, "textarea");
+    //col.classList.add("description");
+    const col = document.createElement("textarea");
+    col.classList.add(`col-${TEXT_COL_SIZE}`);
 
     if (currentHour === hour)
         col.classList.add("present");
@@ -86,7 +87,7 @@ const createContentCol = (content, currentHour, hour) => {
 }
 
 const createBtnCol = (hour) => {
-    const col = createCol(BTN_COL_SIZE, "saveBtn");
+    const col = createSideCol(BTN_COL_SIZE, "saveBtn");
     col.classList.add("d-flex", "justify-content-center");
 
     const icon = createIcon("calendar-plus");
@@ -96,14 +97,13 @@ const createBtnCol = (hour) => {
     });
     
     col.append(icon);
-    
     return col;
 }
 
 const createRow = (currentHour, hour, content) => {
     // Add three col for the row
     const hourCol = createHourCol(hour);
-    const contentCol = createContentCol(content, currentHour, hour);
+    const textCol = createDescCol(currentHour, hour,content);
     const btnCol = createBtnCol(hour);
 
     // Create the current row
@@ -112,7 +112,7 @@ const createRow = (currentHour, hour, content) => {
     row.classList.add("time-block");
     
     row.id = hour;
-    row.append(hourCol, contentCol, btnCol);  
+    row.append(hourCol, textCol, btnCol);  
     
     return row;
 }
