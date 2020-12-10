@@ -1,7 +1,5 @@
 // SVG Link
 const SVG_LINK = "http://www.w3.org/2000/svg";
-// Get info for this moment
-const CURRENT = moment();
 // Schedule length
 const WORK_HOURS = 9;
 // Start Schedule at 9:00
@@ -103,10 +101,13 @@ const createRow = (currentHour, hour, content, setSchedule) => {
 }
 
 (() => {
+    // Get info for this moment
+    let current = moment();
+
     // Initialize current day
     const initCurrentDay = () => {
         const currentDay = document.getElementById("currentDay");
-        currentDay.textContent = CURRENT.format("dddd, MMMM Do");
+        currentDay.textContent = current.format("dddd, MMMM Do");
         currentDay.classList.add("time-block");
     }
 
@@ -123,9 +124,9 @@ const createRow = (currentHour, hour, content, setSchedule) => {
     }
 
     // Load Schedule
-    const loadSchedule = () => {
+    const loadSchedule = () => {        
         const container = document.querySelector(".container");
-        const currentHour = parseInt(CURRENT.toObject().hours);
+        const currentHour = parseInt(current.toObject().hours);
         const schedule = getSchedule();
 
         schedule.forEach((content, i) => {
