@@ -30,19 +30,16 @@ const svgIcons = {
     }
 }
 
-const initSchedule = () => {
-    return ["", "", "", "", "", "", "", "", ""];
-}
+const initSchedule = () => new Array(9).fill("");
 
 const createIcon = (iconType) => {
     const svg = document.createElementNS(SVG_LINK, "svg");
-
     const {properties, paths} = svgIcons[iconType];
 
     // Add all SVG properties
-    const keys = Object.keys(properties);
-    keys.forEach((key) => {
-        svg.setAttribute(key, properties[key])
+    const attrs = Object.keys(properties);
+    attrs.forEach((attr) => {
+        svg.setAttribute(attr, properties[attr])
     })
 
     // Add all paths
@@ -63,18 +60,14 @@ const createHourCol = (hour) => {
 }
 
 const createTextCol = (currentHour, hour, content="") => {
-    
     const col = document.createElement("textarea");
     col.classList.add(`col-${TEXT_COL_SIZE}`, "text");
 
-    if (currentHour === hour)
-        col.classList.add("present");
-    else if (currentHour < hour)
-        col.classList.add("future");
-    else
-        col.classList.add("past");
+    // Class for color of textarea 
+    col.classList.add(currentHour === hour ? "present" : currentHour < hour ? "future" : "past");    
 
-    col.id = hour;
+    // Id for referencing textarea input
+    col.id = `text-${hour}`;
     col.textContent = content;
     return col;
 }
@@ -83,11 +76,11 @@ const createBtnCol = (hour, setSchedule) => {
     const col = document.createElement("div");
     col.classList.add(`col-${BTN_COL_SIZE}`, "saveBtn", "d-flex", "justify-content-center");
 
+    // Create icon. Serves as button for saving schedule
     const icon = createIcon("calendar-plus");
     icon.classList.add("m-auto");
     icon.addEventListener("click", (event) => {
-        // console.log(document.getElementById(hour).value);
-        setSchedule(document.getElementById(hour).value);
+        setSchedule(document.getElementById(`text-${hour}`).value);
     });
     
     col.append(icon);
@@ -106,47 +99,40 @@ const createRow = (currentHour, hour, content, setSchedule) => {
     row.classList.add("time-block");
     
     row.append(hourCol, textCol, btnCol);  
-    
     return row;
 }
 
 (() => {
-    // initialize current day
-    const currentDay = document.getElementById("currentDay");
-    currentDay.textContent = CURRENT.format("dddd, MMMM Do");
-    currentDay.classList.add("time-block");
+    // Initialize current day
+    const initCurrentDay = () => {
+        const currentDay = document.getElementById("currentDay");
+        currentDay.textContent = CURRENT.format("dddd, MMMM Do");
+        currentDay.classList.add("time-block");
+    }
 
+    // Setter and Getter for schedule
     const getSchedule = () => {
         // Get schedule from local storage
         const scheduleInStr = localStorage.getItem("schedule");
         // Make schedule into array
         return scheduleInStr ? scheduleInStr.split(",") : initSchedule();
-    }
-    
+    } 
     const setSchedule = (schedule, i, entry) => {
         schedule[i] = entry;
-        console.log(schedule);
-        localStorage.setItem("schedule", schedule.toString());
-        reloadContent();
+        localStorage.setItem("schedule", schedule.toString());   
     }
 
-    const clearElements = (parent) => {
-        while(parent.firstChild)
-            parent.removeChild(parent.firstChild)
-    }
-
-    const reloadContent = () => {
-        const container = document.getElementsByClassName("container")[0];
-        clearElements(container);
+    // Load Schedule
+    const loadSchedule = () => {
+        const container = document.querySelector(".container");
         const currentHour = parseInt(CURRENT.toObject().hours);
         const schedule = getSchedule();
-        console.log(schedule);
 
         schedule.forEach((content, i) => {
-            const hour = i + START_AT;
-            const row = createRow(currentHour, hour, content, entry => setSchedule(schedule, i, entry));
+            const row = createRow(currentHour, i + START_AT, content, entry => setSchedule(schedule, i, entry));
             container.append(row);       
         }) 
     }
-    reloadContent();
+    initCurrentDay();
+    loadSchedule();
 })();
